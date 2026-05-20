@@ -1,6 +1,15 @@
 import { useState } from 'react';
 import { createEmployee, updateEmployee } from '../services/employee';
 import type { Employee } from '../types';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 
 interface Props {
   employee: Employee | null;
@@ -39,21 +48,28 @@ export default function EmployeeModal({ employee, onClose }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6 mx-4">
-        <h2 className="text-lg font-bold mb-4">
-          {isEdit ? 'Edit Karyawan' : 'Tambah Karyawan'}
-        </h2>
+    <Dialog open={true} onOpenChange={(open) => { if (!open) onClose(); }}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>
+            {isEdit ? 'Edit Karyawan' : 'Tambah Karyawan'}
+          </DialogTitle>
+          <DialogDescription>
+            {isEdit
+              ? 'Ubah informasi pokok data karyawan di bawah ini.'
+              : 'Masukkan data karyawan baru beserta password sementara.'}
+          </DialogDescription>
+        </DialogHeader>
 
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-sm">
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded text-sm">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700">
               NIK
             </label>
             <input
@@ -65,8 +81,8 @@ export default function EmployeeModal({ employee, onClose }: Props) {
             />
           </div>
 
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700">
               Nama
             </label>
             <input
@@ -78,8 +94,8 @@ export default function EmployeeModal({ employee, onClose }: Props) {
             />
           </div>
 
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700">
               Email
             </label>
             <input
@@ -92,8 +108,8 @@ export default function EmployeeModal({ employee, onClose }: Props) {
           </div>
 
           {!isEdit && (
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+            <div className="space-y-1">
+              <label className="block text-sm font-medium text-gray-700">
                 Password Sementara
               </label>
               <input
@@ -106,28 +122,27 @@ export default function EmployeeModal({ employee, onClose }: Props) {
             </div>
           )}
 
-          <div className="flex justify-end gap-2 mt-6">
-            <button
+          <DialogFooter className="gap-2 sm:gap-0 pt-2">
+            <Button
               type="button"
+              variant="outline"
               onClick={() => onClose()}
-              className="px-4 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50"
             >
               Batal
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
               disabled={loading}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 disabled:opacity-50"
             >
               {loading
                 ? 'Menyimpan...'
                 : isEdit
                   ? 'Simpan Perubahan'
                   : 'Tambah'}
-            </button>
-          </div>
+            </Button>
+          </DialogFooter>
         </form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

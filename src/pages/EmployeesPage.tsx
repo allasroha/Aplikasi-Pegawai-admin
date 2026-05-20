@@ -4,8 +4,37 @@ import { getEmployees, deleteEmployee } from '../services/employee';
 import type { Employee } from '../types';
 import EmployeeModal from '../components/EmployeeModal';
 import DeleteConfirmDialog from '../components/DeleteConfirmDialog';
+import { Button } from '@/components/ui/button';
 
 const ITEMS_PER_PAGE = 10;
+
+// Helper to generate scalable pagination range
+const getPaginationRange = (current: number, total: number) => {
+  const delta = 1;
+  const range = [];
+  const rangeWithDots: (number | string)[] = [];
+  let l: number | undefined;
+
+  for (let i = 1; i <= total; i++) {
+    if (i === 1 || i === total || (i >= current - delta && i <= current + delta)) {
+      range.push(i);
+    }
+  }
+
+  for (const i of range) {
+    if (l !== undefined) {
+      if (i - l === 2) {
+        rangeWithDots.push(l + 1);
+      } else if (i - l > 2) {
+        rangeWithDots.push('...');
+      }
+    }
+    rangeWithDots.push(i);
+    l = i;
+  }
+
+  return rangeWithDots;
+};
 
 export default function EmployeesPage() {
   const { user, logout } = useAuth();
@@ -73,6 +102,8 @@ export default function EmployeesPage() {
     }
   };
 
+  const paginationRange = getPaginationRange(page, totalPages);
+
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
@@ -81,12 +112,13 @@ export default function EmployeesPage() {
           <h1 className="text-xl font-bold">Admin Dashboard</h1>
           <div className="flex items-center gap-4">
             <span className="text-sm text-gray-600">{user?.nama}</span>
-            <button
+            <Button
               onClick={logout}
-              className="bg-red-600 text-white px-3 py-1.5 rounded-md text-sm hover:bg-red-700"
+              variant="destructive"
+              size="sm"
             >
               Logout
-            </button>
+            </Button>
           </div>
         </div>
       </header>
@@ -107,12 +139,12 @@ export default function EmployeesPage() {
               (Total: {total})
             </span>
           </h2>
-          <button
+          <Button
             onClick={handleAdd}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+            size="sm"
           >
             + Tambah Karyawan
-          </button>
+          </Button>
         </div>
 
         {/* Table */}
@@ -172,18 +204,22 @@ export default function EmployeesPage() {
                       </span>
                     </td>
                     <td className="px-4 py-3 text-sm space-x-2">
-                      <button
+                      <Button
                         onClick={() => handleEdit(emp)}
-                        className="text-blue-600 hover:text-blue-800"
+                        variant="link"
+                        size="xs"
+                        className="text-blue-600 hover:text-blue-800 p-0"
                       >
                         Edit
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         onClick={() => setDeleteTarget(emp)}
-                        className="text-red-600 hover:text-red-800"
+                        variant="link"
+                        size="xs"
+                        className="text-red-600 hover:text-red-800 p-0"
                       >
                         Hapus
-                      </button>
+                      </Button>
                     </td>
                   </tr>
                 ))
@@ -195,35 +231,42 @@ export default function EmployeesPage() {
         {/* Pagination */}
         {totalPages > 1 && (
           <div className="flex justify-center items-center gap-2 mt-4">
-            <button
+            <Button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="px-3 py-1 border rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100"
+              variant="outline"
+              size="sm"
             >
               Previous
-            </button>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-              (p) => (
-                <button
+            </Button>
+            {paginationRange.map((p, idx) => {
+              if (p === '...') {
+                return (
+                  <span key={`dots-${idx}`} className="px-2.5 py-1 text-sm text-gray-500">
+                    ...
+                  </span>
+                );
+              }
+              return (
+                <Button
                   key={p}
-                  onClick={() => setPage(p)}
-                  className={`px-3 py-1 border rounded text-sm ${
-                    page === p
-                      ? 'bg-blue-600 text-white'
-                      : 'hover:bg-gray-100'
-                  }`}
+                  onClick={() => setPage(p as number)}
+                  variant={page === p ? 'default' : 'outline'}
+                  size="sm"
+                  className="min-w-8"
                 >
                   {p}
-                </button>
-              )
-            )}
-            <button
+                </Button>
+              );
+            })}
+            <Button
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
-              className="px-3 py-1 border rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100"
+              variant="outline"
+              size="sm"
             >
               Next
-            </button>
+            </Button>
           </div>
         )}
       </main>

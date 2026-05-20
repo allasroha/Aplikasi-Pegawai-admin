@@ -1,3 +1,13 @@
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+
 interface Props {
   nama: string;
   onConfirm: () => void;
@@ -10,29 +20,25 @@ export default function DeleteConfirmDialog({
   onCancel,
 }: Props) {
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-lg w-full max-w-sm p-6 mx-4">
-        <h2 className="text-lg font-bold mb-2">Konfirmasi Hapus</h2>
-        <p className="text-sm text-gray-600 mb-6">
-          Apakah Anda yakin ingin menghapus karyawan{' '}
-          <span className="font-semibold">{nama}</span>? Tindakan ini tidak
-          dapat dibatalkan.
-        </p>
-        <div className="flex justify-end gap-2">
-          <button
-            onClick={onCancel}
-            className="px-4 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50"
-          >
+    <Dialog open={true} onOpenChange={(open) => { if (!open) onCancel(); }}>
+      <DialogContent className="max-w-sm">
+        <DialogHeader>
+          <DialogTitle>Konfirmasi Hapus</DialogTitle>
+          <DialogDescription>
+            Apakah Anda yakin ingin menghapus karyawan{' '}
+            <span className="font-semibold text-foreground">{nama}</span>? Tindakan ini tidak
+            dapat dibatalkan.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter className="gap-2 sm:gap-0">
+          <Button variant="outline" onClick={onCancel}>
             Batal
-          </button>
-          <button
-            onClick={onConfirm}
-            className="px-4 py-2 bg-red-600 text-white rounded-md text-sm hover:bg-red-700"
-          >
+          </Button>
+          <Button variant="destructive" onClick={onConfirm}>
             Hapus
-          </button>
-        </div>
-      </div>
-    </div>
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
